@@ -42,8 +42,8 @@ def add_employee(filename, cur, conn):
 
 # TASK 2: GET JOB AND HIRE_DATE INFORMATION
 def job_and_hire_date(cur, conn):
-    job = cur.execute("SELECT Employees.hire_date, Jobs.job_title FROM Employees JOIN Jobs ON Employees.job_id=Jobs.job_id")
-    conn.commit()
+    cur.execute("SELECT Employees.hire_date, Jobs.job_title FROM Employees JOIN Jobs ON Employees.job_id=Jobs.job_id")
+    job = cur.fetchone()[1]
     return job
 
 # TASK 3: IDENTIFY PROBLEMATIC SALARY DATA

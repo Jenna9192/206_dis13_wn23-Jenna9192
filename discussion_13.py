@@ -17,8 +17,8 @@ def setUpDatabase(db_name):
 # CREATE TABLE FOR EMPLOYEE INFORMATION IN DATABASE AND ADD INFORMATION
 def create_employee_table(cur, conn):
     employee_columns = ["employee_id", "first_name", "last_name", "job_id", "hire_date", "salary"]
-    cur.execute("DROP TABLE IF EXISTS employees")
-    cur.execute('CREATE TABLE "employees" ("employee_id" INTEGER PRIMARY KEY, "first_name" TEXT, "last_name" TEXT, "job_id" INTEGER, "hire_date" TEXT, "salary" INTEGER)')
+    cur.execute('CREATE TABLE IF NOT EXISTS employees(employee_id INTEGER PRIMARY KEY,first_name TEXT,last_name TEXT,job_id INTEGER,hire_date TEXT,salary NUMERIC)')
+    
     conn.commit()
 
 # ADD EMPLOYEE'S INFORMTION TO THE TABLE
@@ -29,13 +29,22 @@ def add_employee(filename, cur, conn):
     file_data = f.read()
     f.close()
     # THE REST IS UP TO YOU
-    for employee in file_data:
-        cur.execute('INSERT INTO employees ("employee_id", "first_name", "last_name", "job_id", "hire_date", "salary") VALUES (?,?,?,?,?,?)',
-                    employee["employee_id"], employee["first_name"], employee["last_name"], employee["job_id"], employee["hire_date"] , employee["salary"])
+    json_data = json.loads(file_data)
+    for employee in json_data:
+        id = int(employee["employee_id"])
+        f_name = str(employee["first_name"])
+        l_name = str(employee["last_name"])
+        job = int(employee["job_id"])
+        date = str(employee["hire_date"])
+        sal = int(employee["salary"])
+        cur.execute("""INSERT OR IGNORE INTO employees(employee_id, first_name,last_name, job_id,hire_date, salary)VALUES(?, ?, ?, ?, ?, ?)""",(id, f_name, l_name, job, date, sal))
+    conn.commit()
 
 # TASK 2: GET JOB AND HIRE_DATE INFORMATION
 def job_and_hire_date(cur, conn):
-    pass
+    job = cur.execute("SELECT Employees.hire_date, Jobs.job_title FROM Employees JOIN Jobs ON Employees.job_id=Jobs.job_id")
+    conn.commit()
+    return job
 
 # TASK 3: IDENTIFY PROBLEMATIC SALARY DATA
 # Apply JOIN clause to match individual employees

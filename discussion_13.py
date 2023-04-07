@@ -2,6 +2,7 @@ import unittest
 import sqlite3
 import json
 import os
+import numpy as np
 import matplotlib.pyplot as plt
 # starter code
 
@@ -58,7 +59,37 @@ def problematic_salary(cur, conn):
 
 # TASK 4: VISUALIZATION
 def visualization_salary_data(cur, conn):
-    pass
+    cur.execute("SELECT Jobs.job_title, Employees.salary FROM Jobs JOIN Employees ON Jobs.job_id = Employees.job_id")
+    employee_data = cur.fetchall()
+    cur.execute("SELECT job_title, min_salary, max_salary from Jobs")
+    job_data = cur.fetchall()
+
+    job_salaries = {}
+    for employee in employee_data:
+        job_id = employee[0]
+        salary = employee[1]
+        if job_id not in job_salaries:
+            job_salaries[job_id] = [salary]
+        else:
+            job_salaries[job_id].append(salary)
+    
+    print(job_salaries)
+
+    job_ranges = {}
+    for job in job_data:
+        job_ranges[job[0]] = (job[1], job[2])
+    
+    x = [employee[0] for employee in employee_data]
+    y = [employee[1] for employee in employee_data]
+
+    plt.scatter(x, y)
+
+    for job_id, salary_range in job_ranges.items():
+        plt.scatter(job_id, salary_range[0], color='red', marker='x')
+        plt.scatter(job_id, salary_range[1], color='red', marker='x')
+
+    plt.show()
+
 
 class TestDiscussion12(unittest.TestCase):
     def setUp(self) -> None:
@@ -93,6 +124,8 @@ def main():
 
     wrong_salary = (problematic_salary(cur, conn))
     print(wrong_salary)
+
+    visualization_salary_data(cur, conn)
 
 if __name__ == "__main__":
     main()

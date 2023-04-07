@@ -44,12 +44,17 @@ def add_employee(filename, cur, conn):
 def job_and_hire_date(cur, conn):
     cur.execute("SELECT Employees.hire_date, Jobs.job_title FROM Employees JOIN Jobs ON Employees.job_id=Jobs.job_id")
     job = cur.fetchone()[1]
+    conn.commit()
     return job
 
 # TASK 3: IDENTIFY PROBLEMATIC SALARY DATA
 # Apply JOIN clause to match individual employees
 def problematic_salary(cur, conn):
-    pass
+    cur.execute("SELECT Employees.first_name, Employees.last_name FROM Employees JOIN Jobs ON Jobs.job_id = Employees.job_id WHERE Employees.salary < Jobs.min_salary OR Employees.salary > Jobs.max_salary")
+    lst = []
+    for row in cur:
+        lst.append(row)
+    return lst
 
 # TASK 4: VISUALIZATION
 def visualization_salary_data(cur, conn):
